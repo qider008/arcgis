@@ -1,0 +1,81 @@
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		 xsi:noNamespaceSchemaLocation="http://www.ehcache.org/ehcache.xsd">
+    <diskStore path="java.io.tmpdir"/>
+    <defaultCache
+            maxElementsInMemory="10000"
+            eternal="false"
+            timeToIdleSeconds="120"
+            timeToLiveSeconds="120"
+            overflowToDisk="true"
+            maxElementsOnDisk="10000000"
+            diskPersistent="false"
+            diskExpiryThreadIntervalSeconds="120"
+            memoryStoreEvictionPolicy="LRU"
+            />
+  	<!-- 登录记录缓存 -->
+    <cache name="passwordRetryCache"
+           maxEntriesLocalHeap="2000"
+           eternal="false"
+           timeToIdleSeconds="3600"
+           timeToLiveSeconds="0"
+           overflowToDisk="false"
+           statistics="true">
+    </cache>
+
+	<!-- 授权缓存 -->
+    <cache name="authorizationCache"
+           maxEntriesLocalHeap="2000"
+           eternal="false"
+           timeToIdleSeconds="3600"
+           timeToLiveSeconds="0"
+           overflowToDisk="false"
+           statistics="true">
+    </cache>
+
+	<!-- 认证缓存 -->
+    <cache name="authenticationCache"
+           maxEntriesLocalHeap="2000"
+           eternal="false"
+           timeToIdleSeconds="3600"
+           timeToLiveSeconds="0"
+           overflowToDisk="false"
+           statistics="true">
+    </cache>
+
+    <cache name="shiro-activeSessionCache"
+           maxEntriesLocalHeap="2000"
+           eternal="false"
+           timeToIdleSeconds="3600"
+           timeToLiveSeconds="0"
+           overflowToDisk="false"
+           statistics="true">
+    </cache>
+    
+    <cache name="shiro-kickout-session"
+           maxEntriesLocalHeap="2000"
+           eternal="false"
+           timeToIdleSeconds="3600"
+           timeToLiveSeconds="0"
+           overflowToDisk="false"
+           statistics="true">
+    </cache>
+            
+    <cache name="org.hibernate.cache.spi.UpdateTimestampsCache"
+		   maxElementsInMemory="5000" 
+	       eternal="true" 
+	       overflowToDisk="true" />
+	<cache name="org.hibernate.cache.internal.StandardQueryCache"
+	       maxElementsInMemory="10000" 
+	       eternal="false" 
+	       timeToLiveSeconds="120"
+	       overflowToDisk="true" />	
+	
+
+	<cache name="SimplePageCachingFilter" 
+        maxElementsInMemory="10000" 
+        eternal="false"
+        overflowToDisk="true" 
+        timeToIdleSeconds="900" 
+        timeToLiveSeconds="1800"
+        memoryStoreEvictionPolicy="LFU" />          
+</ehcache>

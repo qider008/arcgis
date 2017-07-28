@@ -1,0 +1,35 @@
+.layui-body{
+	overflow:hidden;
+}
+#tabContainers{
+	overflow-y:auto;
+	overflow-x:hidden;
+}
+.layui-layout-admin.fly-body .layui-header {
+    background-color: #4169E1;
+    height: 60px !important;
+    border-bottom: 5px solid #eee;
+}
+.layui-nav-itemed > a, .layui-nav-tree .layui-nav-title a, .layui-nav-tree .layui-nav-title a:hover{
+	 background-color: #01AAED !important;
+}
+.layui-nav{
+	background-color: #f8ffff;
+}
+.layui-nav-tree .layui-nav-item{
+	background-color: #fff;
+	color:#000;
+}
+.layui-nav-tree .layui-nav-item a{
+	color:#000;
+}
+.layui-nav-tree .layui-nav-item a:hover{
+	background-color: #6A5ACD;
+}
+.layui-nav-tree .layui-nav-child dd.layui-this, .layui-nav-tree .layui-this, .layui-nav-tree .layui-this > a, .layui-nav-tree .layui-this > a:hover{
+	background-color: #1E9FFF;
+}
+.layui-tab-card > .layui-tab-title .layui-this {
+    background: #1E9FFF !important;
+    color: #000 !important;
+}

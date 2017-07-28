@@ -1,0 +1,8 @@
+com\kelan\app\entity\QPersonOfCity.class
+com\kelan\app\entity\QResource.class
+com\kelan\app\entity\QUser.class
+com\kelan\app\entity\QCity.class
+com\kelan\app\entity\QOperation.class
+com\kelan\app\entity\QPerson.class
+com\kelan\app\entity\QRole.class
+com\kelan\app\entity\QPermission.class

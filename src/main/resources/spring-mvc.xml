@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/mvc 
+	http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-4.3.xsd">   	
+	<!-- 自动扫描的包名 -->
+	<context:component-scan base-package="com.kelan.app" use-default-filters="false">
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+		<context:include-filter type="annotation" expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
+	</context:component-scan>	
+     <!-- 设置freeMarker的配置文件路径 -->
+	<bean id="freemarkerConfiguration" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="location" value="classpath:freemarker.properties" />
+	</bean>
+
+    <bean id="freemarkerConfig" class="com.kelan.app.servlet.FreeMarkerConfig">
+		<property name="freemarkerSettings" ref="freemarkerConfiguration" /> 
+		<property name="templateLoaderPath">
+		    <value>/WEB-INF/freemarker/</value>
+		</property>
+		<property name="defaultEncoding">    
+            <value>utf-8</value>    
+        </property> 
+        <property name="freemarkerVariables">    
+            <map>    
+                <entry key="xml_escape" value-ref="fmXmlEscape" />    
+            </map>    
+        </property>     
+	</bean>
+	
+	<bean id="fmXmlEscape" class="freemarker.template.utility.XmlEscape"/>  
+	<!-- 配置freeMarker视图解析器 -->
+	<bean id="freemarkerViewResolver" class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+		<property name="viewClass" value="org.springframework.web.servlet.view.freemarker.FreeMarkerView"/>
+		<property name="exposeRequestAttributes" value="true" />  
+        <property name="exposeSessionAttributes" value="true" />  
+        <property name="exposeSpringMacroHelpers" value="true" />  
+        <property name="requestContextAttribute" value="request" />
+		<property name="contentType" value="text/html; charset=utf-8" />
+		<property name="cache" value="false" />
+		<property name="suffix" value=".ftl" />
+		<property name="order" value="0" />
+	</bean>
+	
+	<!-- 视图解释类	-->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/jsp/" />
+		<property name="suffix" value=".jsp" />
+		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
+		<property name="order" value="1"/>
+	</bean>
+	
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>
+	<!-- 对静态资源文件的访问-->
+	<!-- 对静态资源文件的访问 -->
+	<mvc:default-servlet-handler />	
+	<mvc:resources mapping="/static/**" location="/WEB-INF/static/" /> 
+	<mvc:resources mapping="/html/**" location="/WEB-INF/html/" /> 
+	<mvc:resources mapping="/pdf/**" location="/WEB-INF/pdf/" /> 
+	
+		<!-- 拦截器配置，拦截顺序：先执行后定义的，排在第一位的最后执行。-->
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/**" />
+			<bean class="com.kelan.app.servlet.LogInterceptor" />
+		</mvc:interceptor>
+	</mvc:interceptors>
+
+	<!-- 默认的注解映射的支持 -->
+	<mvc:annotation-driven>
+		<mvc:message-converters register-defaults="true">
+			<!-- 将StringHttpMessageConverter的默认编码设为UTF-8 -->
+			<bean class="org.springframework.http.converter.StringHttpMessageConverter">
+		    	<constructor-arg value="UTF-8" />
+			</bean>
+			<!-- 将Jackson2HttpMessageConverter的默认格式化输出设为true -->
+			<bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+                <property name="prettyPrint" value="true"/>
+            </bean>			
+  		</mvc:message-converters>
+  		<mvc:argument-resolvers>
+			<bean class="com.kelan.app.servlet.CurrentUserMethodArgumentResolver" />
+		</mvc:argument-resolvers>
+	</mvc:annotation-driven>	
+</beans>

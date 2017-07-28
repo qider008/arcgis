@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 如果需要访问这条sql语，需要通过其唯一标识访问到 唯一标识就是 namespace+id的组合 -->
+<mapper namespace="com.kelan.app.mybatis.dao.UserMapper">
+
+	<insert id="insert" parameterType="com.kelan.app.entity.User" useGeneratedKeys="true" keyProperty="userId">
+		insert into
+		sys_user(userId,username,password,email,salt)
+		values(#{userId},#{username},#{password},#{email},#{salt})
+	</insert>
+	<select id="getAllUser" resultType="com.kelan.app.entity.User">
+		select * from sys_user t
+	</select>
+</mapper>
