@@ -2,6 +2,7 @@ package com.kelan.common.utils;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,6 +15,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document.OutputSettings;
+import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,8 +37,8 @@ import com.itextpdf.tool.xml.pipeline.html.HtmlPipelineContext;
 * @version 创建时间：2017年7月17日 下午5:25:31
 * 类说明
 */
-public class PdfUtil {
-	
+public class PdfUtils {
+    private static Logger logger = LoggerFactory.getLogger(PdfUtils.class);
     /**
      * PDF生成路径
      */
@@ -59,9 +63,10 @@ public class PdfUtil {
             if (size == 0) {
                 size = 4;
             }
-            String webRoot=request.getServletContext().getRealPath("WEB-INF");
+            //String webRoot=request.getServletContext().getRealPath("WEB-INF");
             try {
-				BaseFont bf = BaseFont.createFont(webRoot+"\\font\\simsun.ttc,1", BaseFont.IDENTITY_H,BaseFont.NOT_EMBEDDED);
+				//BaseFont bf = BaseFont.createFont(webRoot+"\\font\\simsun.ttc,1", BaseFont.IDENTITY_H,BaseFont.NOT_EMBEDDED);
+				BaseFont bf = BaseFont.createFont("E:\\Software\\workspaces\\kelan\\src\\main\\webapp\\WEB-INF\\font\\simsun.ttc,1", BaseFont.IDENTITY_H,BaseFont.NOT_EMBEDDED);
 				return new Font(bf, size, style);
 			} catch (DocumentException e) {
 				e.printStackTrace();
@@ -71,10 +76,6 @@ public class PdfUtil {
             return super.getFont(fntname, encoding, size, style);
         }
     }
-
-    private static Logger logger = LoggerFactory.getLogger(PdfUtil.class);
-
-
     /**
      * 导出PDF文件
      * 
@@ -110,11 +111,14 @@ public class PdfUtil {
                 document.open();   
                 String filename=request.getSession().getServletContext().getRealPath(filePath);
 
-/*                org.jsoup.nodes.Document docu=Jsoup.parse(new File(filename), "UTF-8");
+                org.jsoup.nodes.Document docu=Jsoup.parse(new File(filename), "UTF-8");
+    			OutputSettings setting=new OutputSettings();
+    			setting.syntax(OutputSettings.Syntax.xml);
+    			docu.outputSettings(setting);
                 
                 try(FileOutputStream o=new FileOutputStream(new File("D:/test.html"))){
                 	o.write(docu.html().getBytes());
-                }*/
+                }
                 
                 InputStream htmlInput = new FileInputStream(new File(filename));
                 // 使用我们的字体提供器，并将其设置为unicode字体样式
@@ -127,7 +131,7 @@ public class PdfUtil {
                 XMLWorkerHelper.getInstance().getDefaultCssResolver(true);
 
                 XMLWorkerHelper.getInstance().parseXHtml(writer, document, htmlInput, null, Charset.forName("UTF-8"),fontProvider);
-
+                
                 document.close();
                 writer.close();
                 // 设置文件ContentType类型，这样设置，会自动判断下载文件类型
@@ -165,6 +169,61 @@ public class PdfUtil {
             }
         }
     }
+    public static void exportPdf(String inFile,String outFile){
+    	
+		File file=new File(inFile);
+	
+		org.jsoup.nodes.Document docu = null;
+		try {
+			docu = Jsoup.parse(new File(inFile), "UTF-8");
+			OutputSettings setting=new OutputSettings();
+			setting.syntax(OutputSettings.Syntax.xml);
+			docu.outputSettings(setting);
+			
+	        Elements head=docu.select("head");
+	        if(head.select("meta").isEmpty()) {
+	        	head.append("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"/>");
+	        }	        
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+        try(FileOutputStream o=new FileOutputStream(file)){
+        	o.write(docu.html().replaceAll("<([a-z]+?)(?:\\s+?[^>]*?)?>\\s*?<\\/\\1>", "").getBytes());
+        } catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    	Document document = new Document();
+        // step 2
+        PdfWriter writer = null;
+		try {
+			writer = PdfWriter.getInstance(document, new FileOutputStream(outFile));
+			// step 3
+	        document.open();
+	        // step 4
+	        MyFontsProvider fontProvider = new MyFontsProvider();
+	        fontProvider.addFontSubstitute("lowagie", "garamond");
+	        fontProvider.setUseUnicode(true);
+	        CssAppliers cssAppliers = new CssAppliersImpl(fontProvider);
+	        HtmlPipelineContext htmlContext = new HtmlPipelineContext(cssAppliers);
+	        htmlContext.setTagFactory(Tags.getHtmlTagProcessorFactory());
+	        XMLWorkerHelper.getInstance().getDefaultCssResolver(true);
+	        XMLWorkerHelper.getInstance().parseXHtml(writer, document, new FileInputStream(file), null, Charset.forName("UTF-8"),fontProvider);
+		} catch (FileNotFoundException | DocumentException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}finally {
+			document.close();
+			if(null!=writer) {
+				writer.close();
+			}
+			
+		}
+    }
+    
 
     /**
      * 删除文件
